@@ -1,10 +1,6 @@
 Class FHIRDemo.Service.POSTService Extends EnsLib.HL7.Service.Standard
 {
 
-Parameter CONTENTTYPE = "text/xml";
-
-Parameter ADAPTER = "EnsLib.HTTP.InboundAdapter";
-
 Property TargetConfigNames As %String(MAXLEN = 1000) [ InitialExpression = "HL7toSDAProcess" ];
 
 Parameter SETTINGS = "TargetConfigNames:Basic:selector?multiSelect=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
@@ -16,11 +12,27 @@ Method OnProcessInput(pDocIn As %RegisteredObject, Output pDocOut As %Registered
     if pDocIn.%IsA("FHIRDemo.Msg.AppointmentRequest") {
         set status = ..Custom(pDocIn,.pDocOut)
     }
+    ElseIf pDocIn.%IsA("Ens.StreamContainer") {
+        set status = ..CCDA(pDocIn,.pDocOut)
+    }	
     Else {
         set status = ..Default(pDocIn,.pDocOut)
     }
     
 
+    Quit status
+}
+
+Method CCDA(pDocIn As %RegisteredObject, Output pDocOut As %RegisteredObject) As %Status
+{
+    set status = $$$OK
+    set request = pDocIn
+    
+    try {
+        $$$ThrowOnError(..SendRequestSync("FHIRDemo.CCDATransformProcess", request, .pDocOut))
+    } catch ex {
+        set status = ex.AsStatus()
+    }
     Quit status
 }
 
