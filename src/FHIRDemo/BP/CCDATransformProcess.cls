@@ -16,9 +16,11 @@ Method OnRequest(pRequest As Ens.StreamContainer, Output pResponse As Ens.Respon
 	try {
 
 		set tCCDA = pRequest.Stream
+
 		Set tXSL = "SDA3/CCDAv21-to-SDA.xsl"
 
 		Set tTransformer = ##class(HS.Util.XSLTTransformer).%New()
+		//Set tTransformer.UseXSLT2 = 1
 
 		$$$ThrowOnError(tTransformer.Transform(tCCDA, tXSL, .tSDA))
 

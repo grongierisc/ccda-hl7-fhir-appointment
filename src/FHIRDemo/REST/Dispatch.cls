@@ -3,7 +3,7 @@ Class FHIRDemo.REST.Dispatch Extends %CSP.REST
 
 Parameter BsName = "WS_REST";
 
-// Parameter CHARSET = "UTF-8";
+Parameter CHARSET = "UTF-8";
 
 Parameter CONVERTINPUTSTREAM = 1;
 
@@ -45,22 +45,21 @@ ClassMethod ccda() As %Status
 {
     set status = $$$OK
 
-    #; Set tStream = ##class(%FileCharacterStream).%New(), tStream.TranslateTable="UTF8"
-    #; Set tStream.Filename = "tmp"
+    Set tStream = ##class(%GlobalBinaryStream).%New() 
 
     #; set tContent = %request.Content
     #; Do tContent.Rewind()    
-    #; while 'tContent.AtEnd{
-    #;     set temp=tContent.Read()
-    #;     set temp=$zcvt(temp,"I","UTF8")
+    #; while 'tContent.AtEnd {
+    #;     set temp=tContent.ReadLine()
+    #;     //set temp=$zcvt(temp,"O","UTF8")
     #;     //set temp=$translate(temp, $c(13,10))
     #;     //set temp=$REPLACE(temp, "\r\n","")
-    #;     do tStream.Write(temp)
+    #;     do tStream.WriteLine(temp)
     #; }
 
-    #; do tStream.CopyFromAndSave()
+    Set tStream = %request.Content
 
-    set tMsg = ##class(Ens.StreamContainer).%New(%request.Content)
+    set tMsg = ##class(Ens.StreamContainer).%New(tStream)
     
     try {
 
@@ -135,6 +134,14 @@ ClassMethod clean() As %Status
     kill ^HSFHIR.I00017C00.valueQuantityI 
     kill ^HSFHIR.I007C00.comboValueQ204ED 
     kill ^HSFHIR.I007C00.comboValueQ204EI
+    kill ^HSFHIR.I0001.S.ImmunizationD 
+    kill ^HSFHIR.I0001.S.ImmunizationI 
+    kill ^HSFHIR.I0001.S.MedicationD 
+    kill ^HSFHIR.I0001.S.MedicationI 
+    kill ^HSFHIR.I0023D1.DiagnosticR9BA8D 
+    kill ^HSFHIR.I0023D1.DiagnosticR9BA8I 
+    kill ^HSFHIR.I0023D1.MedicationS448BD 
+    kill ^HSFHIR.I0023D1.MedicationS448BI
 
     
     Set %response.ContentType = ..#CONTENTTYPEJSON
